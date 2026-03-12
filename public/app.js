@@ -20,14 +20,15 @@ const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
   if (typeof saved.bgInt === "number") bgInt.value = saved.bgInt;
   applyAccent(accent.value);
   applyBgIntensity(parseFloat(bgInt.value));
+  syncThemeToggle(root.getAttribute("data-theme") || "dark");
 
   // alternar tema light/dark
   themeToggle.addEventListener("click", ()=>{
     const cur = root.getAttribute("data-theme");
     const next = cur === "light" ? "dark" : "light";
     root.setAttribute("data-theme", next);
-    themeToggle.setAttribute("aria-pressed", String(next==="light"));
-    themeToggle.textContent = next==="light" ? "☀︎" : "☾";
+    syncThemeToggle(next);
+    applyAccent(accent.value);
     persist();
   });
 
@@ -52,14 +53,36 @@ const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
   }
   function applyAccent(hex){
     const {h,s,l} = hexToHSL(hex);
+    const theme = root.getAttribute("data-theme") || "dark";
     root.style.setProperty("--accent", hex);
     root.style.setProperty("--accent-2", `hsl(${h} ${Math.max(40,s-5)}% ${Math.max(30,l-10)}%)`);
     root.style.setProperty("--accent-h", h);
-    root.style.setProperty("--bg-r1", `hsla(${h} 70% 35% / 0.65)`);
-    root.style.setProperty("--bg-r2", `hsla(${h} 70% 28% / 0.5)`);
+    if (theme === "light") {
+      root.style.setProperty("--bg-r1", `color-mix(in srgb, ${hex} 15%, #ffffff)`);
+      root.style.setProperty("--bg-r2", `color-mix(in srgb, ${hex} 10%, #f3f1ff)`);
+      root.style.setProperty("--mock-body-start", `color-mix(in srgb, ${hex} 12%, #ffffff)`);
+      root.style.setProperty("--mock-chrome-start", `color-mix(in srgb, ${hex} 8%, #ffffff)`);
+      root.style.setProperty("--surface-floating-start", `color-mix(in srgb, ${hex} 12%, #ffffff)`);
+      root.style.setProperty("--dot-idle", `color-mix(in srgb, ${hex} 18%, #d6cfeb)`);
+      root.style.setProperty("--dot-active", hex);
+      root.style.setProperty("--mock-url-text", `color-mix(in srgb, ${hex} 30%, var(--text))`);
+    } else {
+      root.style.setProperty("--bg-r1", `hsla(${h} 70% 35% / 0.65)`);
+      root.style.setProperty("--bg-r2", `hsla(${h} 70% 28% / 0.5)`);
+      root.style.setProperty("--mock-body-start", `color-mix(in srgb, ${hex} 20%, #1b1236)`);
+      root.style.setProperty("--mock-chrome-start", `color-mix(in srgb, ${hex} 22%, #110b22)`);
+      root.style.setProperty("--surface-floating-start", `color-mix(in srgb, ${hex} 35%, #222)`);
+      root.style.setProperty("--dot-idle", `hsl(${h} 38% 36%)`);
+      root.style.setProperty("--dot-active", `hsl(${h} 100% 82%)`);
+      root.style.setProperty("--mock-url-text", `hsl(${h} 100% 90%)`);
+    }
     window.__setBgHue?.(h);
   }
   function applyBgIntensity(v){ document.documentElement.style.setProperty("--bg-intensity", v); window.__setBgIntensity?.(v); }
+  function syncThemeToggle(theme){
+    themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+    themeToggle.textContent = theme === "light" ? "☀︎" : "☾";
+  }
   function hexToHSL(H){
     H=H.replace("#",""); let r,g,b;
     if(H.length===3){ r=parseInt(H[0]+H[0],16); g=parseInt(H[1]+H[1],16); b=parseInt(H[2]+H[2],16); }
@@ -243,6 +266,7 @@ setupCarousel(".carousel");
     const v = variants[i];
     body.dataset.variant = v;
     const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    const chartFrame = getComputedStyle(document.documentElement).getPropertyValue("--chart-frame").trim();
 
     if(v==="dashboard"){
       const stats = [
@@ -258,7 +282,7 @@ setupCarousel(".carousel");
         <div class="mb-stats">
           ${stats.map(s=>`<div class="mb-card"><small>${s.k}</small><br><b>${s.v}</b><br><small>${s.delta}</small></div>`).join("")}
         </div>
-        <div class="mb-chart">${lineChartSVG(24, accent)}</div>
+        <div class="mb-chart">${lineChartSVG(24, accent, chartFrame)}</div>
         <table class="mb-table">
           <thead><tr><th>Canal</th><th>Leads</th><th>CVR</th><th>Receita</th></tr></thead>
           <tbody>
@@ -298,7 +322,7 @@ setupCarousel(".carousel");
     }
   }
 
-  function lineChartSVG(n, color){
+  function lineChartSVG(n, color, frame){
     const pts = Array.from({length:n},()=>Math.random()*0.8+0.2);
     const w = 560, h = 140, pad = 10;
     const step = (w - pad*2)/(n-1);
@@ -316,7 +340,7 @@ setupCarousel(".carousel");
             <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <rect x="1" y="1" width="${w-2}" height="${h-2}" rx="10" ry="10" fill="none" stroke="rgba(255,255,255,.12)"/>
+        <rect x="1" y="1" width="${w-2}" height="${h-2}" rx="10" ry="10" fill="none" stroke="${frame}"/>
         <path d="${area}" fill="url(#gArea)"/>
         <path d="${path}" fill="none" stroke="${color}" stroke-width="2.5"/>
       </svg>
