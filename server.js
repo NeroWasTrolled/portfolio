@@ -8,6 +8,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const CONTACT_DESTINATION = "gabrielfrancasimoes@gmail.com";
 
 const __dirname = path.resolve();
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -52,20 +53,38 @@ app.post("/api/contact", async (req,res)=>{
         host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT||587), secure:false,
         auth:{ user:process.env.SMTP_USER, pass:process.env.SMTP_PASS }
       });
+      const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
+      const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "full",
+        timeStyle: "short",
+        timeZone: "America/Sao_Paulo"
+      }).format(new Date(record.createdAt));
       await transporter.sendMail({
         from: `Portfolio Bot <${process.env.SMTP_USER}>`,
-        to: process.env.NOTIFY_TO || process.env.SMTP_USER,
-        subject: "Novo contato do portfólio (freelance)",
-        html: `
-          <h2>Novo Lead</h2>
-          <p><b>Nome:</b> ${esc(name)}</p>
-          <p><b>Email:</b> ${esc(email)}</p>
-          <p><b>Budget:</b> ${budget ? "R$ "+Number(budget).toLocaleString("pt-BR") : "não informado"}</p>
-          <p><b>Mensagem:</b></p>
-          <pre style="white-space:pre-wrap;font-family:inherit">${esc(message)}</pre>
-          <small>${record.createdAt}</small>
-        `
+        to: process.env.NOTIFY_TO || CONTACT_DESTINATION,
+        replyTo: email,
+        subject: `Novo lead do portfolio: ${name}`,
+        text: [
+          "Novo lead recebido pelo portfolio",
+          `Nome: ${name}`,
+          `Email: ${email}`,
+          `Budget: ${formattedBudget}`,
+          "",
+          "Descricao do projeto:",
+          message,
+          "",
+          `Recebido em: ${formattedDate}`
+        ].join("\n"),
+        html: buildContactEmail({
+          name: esc(name),
+          email: esc(email),
+          budget: esc(formattedBudget),
+          message: esc(message),
+          createdAt: esc(formattedDate)
+        })
       });
+    } else {
+      console.warn("SMTP nao configurado. Lead salvo localmente, mas nenhum email foi enviado.");
     }
   }catch(e){ console.error("Email fail:", e.message); }
 
@@ -84,5 +103,42 @@ app.get("/api/availability", (req,res)=>{
 
 function rid(){ return "lead_"+Math.random().toString(36).slice(2)+Date.now().toString(36); }
 function esc(s=""){return s.replace(/[&<>"'`=\/]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;","/":"&#x2F;","`":"&#x60;","=":"&#x3D;"}[m]));}
+function buildContactEmail({ name, email, budget, message, createdAt }){
+  return `
+    <div style="margin:0;padding:24px;background:#f5f1ff;font-family:Arial,Helvetica,sans-serif;color:#181424;">
+      <div style="max-width:680px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid rgba(109,44,255,.12);box-shadow:0 24px 60px rgba(46,22,105,.12);">
+        <div style="padding:32px;background:linear-gradient(135deg,#1a1234 0%,#6d2cff 100%);color:#ffffff;">
+          <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.72;">Novo lead</div>
+          <h1 style="margin:12px 0 8px;font-size:28px;line-height:1.2;">Contato recebido pelo portfolio</h1>
+          <p style="margin:0;font-size:15px;line-height:1.6;opacity:.82;">As informacoes abaixo foram enviadas pelo formulario do site.</p>
+        </div>
+        <div style="padding:32px;">
+          <div style="display:grid;gap:16px;">
+            <div style="padding:16px 20px;border-radius:16px;background:#f8f5ff;border:1px solid rgba(109,44,255,.1);">
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#6f6694;margin-bottom:8px;">Nome</div>
+              <div style="font-size:18px;font-weight:700;color:#181424;">${name}</div>
+            </div>
+            <div style="padding:16px 20px;border-radius:16px;background:#f8f5ff;border:1px solid rgba(109,44,255,.1);">
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#6f6694;margin-bottom:8px;">Email</div>
+              <div style="font-size:16px;font-weight:600;color:#181424;">${email}</div>
+            </div>
+            <div style="padding:16px 20px;border-radius:16px;background:#f8f5ff;border:1px solid rgba(109,44,255,.1);">
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#6f6694;margin-bottom:8px;">Budget</div>
+              <div style="font-size:16px;font-weight:700;color:#181424;">${budget}</div>
+            </div>
+            <div style="padding:20px;border-radius:20px;background:#120d20;color:#f6f1ff;">
+              <div style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#b6a8ee;margin-bottom:12px;">Descricao do projeto</div>
+              <div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">${message}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:20px 32px;border-top:1px solid rgba(109,44,255,.12);background:#fcfbff;color:#6f6694;font-size:13px;line-height:1.6;">
+          <strong style="color:#181424;display:block;margin-bottom:4px;">Recebido em</strong>
+          ${createdAt}
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 app.listen(PORT, ()=> console.log(`🚀 http://localhost:${PORT}`));

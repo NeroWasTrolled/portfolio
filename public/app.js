@@ -1,6 +1,7 @@
 /* ===== helpers ===== */
 const $ = (s,ctx=document)=>ctx.querySelector(s);
 const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+const isTouchLike = () => window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
 function bindPressFeedback(targets){
   targets.forEach(el=>{
@@ -58,6 +59,17 @@ function bindPressFeedback(targets){
   bgInt.addEventListener("input", e=> { applyBgIntensity(parseFloat(e.target.value)); persist(); });
   save.onclick = persist;
   reset.onclick = ()=> { localStorage.removeItem("theme_prefs"); location.reload(); };
+
+  document.addEventListener("pointerdown", e=>{
+    if (!panel.classList.contains("open")) return;
+    if (panel.contains(e.target) || openBtn.contains(e.target)) return;
+    panel.classList.remove("open");
+    openBtn.setAttribute("aria-pressed", "false");
+  });
+  addEventListener("resize", ()=>{
+    if (!isTouchLike()) return;
+    panel.classList.remove("min");
+  }, {passive:true});
 
   function persist(){
     localStorage.setItem("theme_prefs",
@@ -190,6 +202,7 @@ function setupCarousel(rootSel){
   const dots=$(".c-dots", root);
 
   let index=0, gap=16, slideW=0, minTX=0, indexMax=0;
+  let dragStartX=0, dragCurrentX=0, dragging=false;
 
   const viewportWidth = () => {
     const cs = getComputedStyle(root);
@@ -230,8 +243,32 @@ function setupCarousel(rootSel){
   next && (next.onclick=()=>{ index=Math.min(indexMax,index+1); apply(); });
   bindPressFeedback([prev, next]);
 
-  track.style.touchAction="manipulation";
-  ["pointerdown","pointermove","pointerup"].forEach(ev=>track.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+  track.style.touchAction="pan-y";
+  track.addEventListener("pointerdown", e=>{
+    if (!isTouchLike()) return;
+    dragging = true;
+    dragStartX = e.clientX;
+    dragCurrentX = e.clientX;
+    root.classList.add("is-dragging");
+  });
+  track.addEventListener("pointermove", e=>{
+    if (!dragging || !isTouchLike()) return;
+    dragCurrentX = e.clientX;
+  });
+  const endDrag = ()=>{
+    if (!dragging) return;
+    const delta = dragCurrentX - dragStartX;
+    if (Math.abs(delta) > 42) {
+      if (delta < 0) index=Math.min(indexMax,index+1);
+      else index=Math.max(0,index-1);
+    }
+    dragging = false;
+    root.classList.remove("is-dragging");
+    apply();
+  };
+  track.addEventListener("pointerup", endDrag);
+  track.addEventListener("pointercancel", endDrag);
+  track.addEventListener("pointerleave", ()=>{ if (dragging && isTouchLike()) endDrag(); });
   recalc();
 
   function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
@@ -242,6 +279,7 @@ setupCarousel(".carousel");
 (function tiltFX(){
   const max=10;
   $$(".tilt").forEach(el=>{
+    if (isTouchLike()) return;
     el.addEventListener("mousemove", e=>{
       const r=el.getBoundingClientRect(); const dx=(e.clientX-(r.left+r.width/2))/(r.width/2); const dy=(e.clientY-(r.top+r.height/2))/(r.height/2);
       el.style.transform=`rotateX(${(-dy*max).toFixed(2)}deg) rotateY(${(dx*max).toFixed(2)}deg)`;
@@ -252,6 +290,7 @@ setupCarousel(".carousel");
 (function magneticFX(){
   const s=18;
   $$(".magnetic").forEach(el=>{
+    if (isTouchLike()) return;
     el.style.transform="translate3d(0,0,0)";
     el.addEventListener("mousemove", e=>{
       const r=el.getBoundingClientRect(); const dx=(e.clientX-(r.left+r.width/2))/r.width; const dy=(e.clientY-(r.top+r.height/2))/r.height;
@@ -276,9 +315,35 @@ setupCarousel(".carousel");
   const variants = ["dashboard","landing","auth"];
   let i = variants.indexOf(body.dataset.variant || "dashboard");
   if(i<0) i=0;
+  let swipeStartX=0;
+  let swipeCurrentX=0;
+  let swiping=false;
 
   $("#mockPrev")?.addEventListener("click", ()=>{ i=(i-1+variants.length)%variants.length; render(); });
   $("#mockNext")?.addEventListener("click", ()=>{ i=(i+1)%variants.length; render(); });
+
+  body.addEventListener("pointerdown", e=>{
+    if (!isTouchLike()) return;
+    swiping = true;
+    swipeStartX = e.clientX;
+    swipeCurrentX = e.clientX;
+  });
+  body.addEventListener("pointermove", e=>{
+    if (!swiping || !isTouchLike()) return;
+    swipeCurrentX = e.clientX;
+  });
+  const finishSwipe = ()=>{
+    if (!swiping) return;
+    const delta = swipeCurrentX - swipeStartX;
+    if (Math.abs(delta) > 40) {
+      i = delta < 0 ? (i+1)%variants.length : (i-1+variants.length)%variants.length;
+      render();
+    }
+    swiping = false;
+  };
+  body.addEventListener("pointerup", finishSwipe);
+  body.addEventListener("pointercancel", finishSwipe);
+  body.addEventListener("pointerleave", ()=>{ if (swiping && isTouchLike()) finishSwipe(); });
 
   function render(){
     body.classList.add("is-changing");
