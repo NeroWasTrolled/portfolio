@@ -2,6 +2,19 @@
 const $ = (s,ctx=document)=>ctx.querySelector(s);
 const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
 
+function bindPressFeedback(targets){
+  targets.forEach(el=>{
+    if (!el) return;
+    const add = ()=> el.classList.add("is-pressed");
+    const remove = ()=> el.classList.remove("is-pressed");
+    el.addEventListener("pointerdown", add);
+    el.addEventListener("pointerup", remove);
+    el.addEventListener("pointerleave", remove);
+    el.addEventListener("pointercancel", remove);
+    el.addEventListener("blur", remove);
+  });
+}
+
 /* ===== THEME + CUSTOMIZER ===== */
 (function themeInit(){
   const root = document.documentElement;
@@ -160,6 +173,7 @@ const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
   const onScroll=()=>{ const y=scrollY; header.classList.toggle("scrolled", y>10); toTop.classList.toggle("show", y>500); };
   addEventListener("scroll", onScroll, {passive:true}); onScroll();
   toTop.addEventListener("click", ()=> scrollTo({top:0, behavior:"smooth"}));
+  bindPressFeedback([toTop, $("#themeToggle"), $("#openCustomizer")]);
 
   const spyLinks=$$("a[data-spy]"); const sections=spyLinks.map(a=>$(a.getAttribute("href")));
   const obs=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const id=`#${e.target.id}`; spyLinks.forEach(a=>a.classList.toggle("active", a.getAttribute("href")===id)); }}) },{rootMargin:"-45% 0px -50% 0px", threshold:0.01});
@@ -214,6 +228,7 @@ function setupCarousel(rootSel){
   }
   prev && (prev.onclick=()=>{ index=Math.max(0,index-1); apply(); });
   next && (next.onclick=()=>{ index=Math.min(indexMax,index+1); apply(); });
+  bindPressFeedback([prev, next]);
 
   track.style.touchAction="manipulation";
   ["pointerdown","pointermove","pointerup"].forEach(ev=>track.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
@@ -245,6 +260,9 @@ setupCarousel(".carousel");
     el.addEventListener("mouseleave", ()=> el.style.transform="translate(0,0)");
   });
 })();
+(function interactionFX(){
+  bindPressFeedback($$(".btn, .btn-mini, .auth button, .mock-actions button, .theme-toggle, .fab, .to-top"));
+})();
 (function reveal(){
   const obs=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("show"); obs.unobserve(e.target); }}) },{threshold:.12});
   $$(".section .glass, .section .cards .card, .plan, .step").forEach(el=>{ el.classList.add("reveal"); obs.observe(el); });
@@ -263,6 +281,7 @@ setupCarousel(".carousel");
   $("#mockNext")?.addEventListener("click", ()=>{ i=(i+1)%variants.length; render(); });
 
   function render(){
+    body.classList.add("is-changing");
     const v = variants[i];
     body.dataset.variant = v;
     const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
@@ -320,6 +339,11 @@ setupCarousel(".carousel");
         </form>
       `;
     }
+
+    requestAnimationFrame(()=>{
+      bindPressFeedback($$(".btn-mini, .auth button, .mock-actions button", body.parentElement || document));
+      requestAnimationFrame(()=> body.classList.remove("is-changing"));
+    });
   }
 
   function lineChartSVG(n, color, frame){
