@@ -439,6 +439,23 @@ setupCarousel(".carousel");
 })();
 
 /* ===== Quote & Contact ===== */
+function syncFloatingLabels(root=document){
+  $$(".field", root).forEach(field=>{
+    const control = $("input, textarea", field);
+    if (!control) return;
+    const hasValue = control.value.trim().length > 0;
+    field.classList.toggle("is-filled", hasValue);
+  });
+}
+
+syncFloatingLabels();
+$$(".field input, .field textarea").forEach(control=>{
+  const update = ()=> syncFloatingLabels(control.closest(".field")?.parentElement?.parentElement || document);
+  control.addEventListener("input", update);
+  control.addEventListener("change", update);
+  control.addEventListener("blur", update);
+});
+
 $("#quoteForm")?.addEventListener("submit", async e=>{
   e.preventDefault();
   const fd=new FormData(e.target);
@@ -451,12 +468,28 @@ $("#quoteForm")?.addEventListener("submit", async e=>{
 });
 $("#contactForm")?.addEventListener("submit", async e=>{
   e.preventDefault();
-  const fd=new FormData(e.target); const payload=Object.fromEntries(fd.entries()); payload.budget = payload.budget ? Number(payload.budget) : null;
+  const form = e.target;
+  const fd=new FormData(form); const payload=Object.fromEntries(fd.entries()); payload.budget = payload.budget ? Number(payload.budget) : null;
   const btn=$("#contactForm button"); const msg=$("#formMsg"); btn.disabled=true; btn.textContent="Enviando…";
+  msg.style.color="var(--muted)";
+  msg.textContent="Preparando envio...";
   try{
     const r=await fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-    const data=await r.json(); if(data.ok){ msg.style.color="var(--good)"; msg.textContent="Mensagem enviada!"; e.target.reset(); } else throw 0;
-  }catch{ msg.style.color="var(--bad)"; msg.textContent="Erro ao enviar. Tente novamente."; }
+    const data=await r.json().catch(()=>({ ok:false, error:"Resposta invalida do servidor." }));
+    if(!r.ok || !data.ok) {
+      const detail = data.saved
+        ? `${data.error || "Erro ao enviar. Tente novamente."} Seus dados foram salvos localmente.`
+        : (data.error || "Erro ao enviar. Tente novamente.");
+      throw new Error(detail);
+    }
+    msg.style.color="var(--good)";
+    msg.textContent=data.message || "Mensagem enviada com sucesso!";
+    form.reset();
+    syncFloatingLabels(form);
+  }catch(error){
+    msg.style.color="var(--bad)";
+    msg.textContent=error.message || "Erro ao enviar. Tente novamente.";
+  }
   finally{ btn.disabled=false; btn.textContent="Enviar"; }
 });
 

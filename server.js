@@ -41,54 +41,67 @@ app.post("/api/quote", (req,res)=>{
 
 app.post("/api/contact", async (req,res)=>{
   const { name, email, message, budget } = req.body || {};
-  if (!name || !email || !message) return res.status(400).json({ ok:false, error:"Campos obrigatórios ausentes." });
+  if (!name || !email || !message) return res.status(400).json({ ok:false, error:"Campos obrigatorios ausentes." });
 
   const record = { id: rid(), name, email, message, budget: budget ?? null, createdAt: new Date().toISOString() };
   const arr = JSON.parse(fs.readFileSync(LEADS_FILE,"utf-8")); arr.push(record);
   fs.writeFileSync(LEADS_FILE, JSON.stringify(arr,null,2));
 
-  try{
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT||587), secure:false,
-        auth:{ user:process.env.SMTP_USER, pass:process.env.SMTP_PASS }
-      });
-      const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
-      const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-        dateStyle: "full",
-        timeStyle: "short",
-        timeZone: "America/Sao_Paulo"
-      }).format(new Date(record.createdAt));
-      await transporter.sendMail({
-        from: `Portfolio Bot <${process.env.SMTP_USER}>`,
-        to: process.env.NOTIFY_TO || CONTACT_DESTINATION,
-        replyTo: email,
-        subject: `Novo lead do portfolio: ${name}`,
-        text: [
-          "Novo lead recebido pelo portfolio",
-          `Nome: ${name}`,
-          `Email: ${email}`,
-          `Budget: ${formattedBudget}`,
-          "",
-          "Descricao do projeto:",
-          message,
-          "",
-          `Recebido em: ${formattedDate}`
-        ].join("\n"),
-        html: buildContactEmail({
-          name: esc(name),
-          email: esc(email),
-          budget: esc(formattedBudget),
-          message: esc(message),
-          createdAt: esc(formattedDate)
-        })
-      });
-    } else {
-      console.warn("SMTP nao configurado. Lead salvo localmente, mas nenhum email foi enviado.");
-    }
-  }catch(e){ console.error("Email fail:", e.message); }
+  const hasSmtpConfig = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  if (!hasSmtpConfig) {
+    return res.status(503).json({
+      ok:false,
+      saved:true,
+      error:"O servidor ainda nao esta configurado para envio de email. Preencha o arquivo .env com as credenciais SMTP."
+    });
+  }
 
-  res.json({ ok:true, id: record.id });
+  try{
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT||587), secure:false,
+      auth:{ user:process.env.SMTP_USER, pass:process.env.SMTP_PASS }
+    });
+    const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
+    const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone: "America/Sao_Paulo"
+    }).format(new Date(record.createdAt));
+
+    await transporter.sendMail({
+      from: `Portfolio Bot <${process.env.SMTP_USER}>`,
+      to: process.env.NOTIFY_TO || CONTACT_DESTINATION,
+      replyTo: email,
+      subject: `Novo lead do portfolio: ${name}`,
+      text: [
+        "Novo lead recebido pelo portfolio",
+        `Nome: ${name}`,
+        `Email: ${email}`,
+        `Budget: ${formattedBudget}`,
+        "",
+        "Descricao do projeto:",
+        message,
+        "",
+        `Recebido em: ${formattedDate}`
+      ].join("\n"),
+      html: buildContactEmail({
+        name: esc(name),
+        email: esc(email),
+        budget: esc(formattedBudget),
+        message: esc(message),
+        createdAt: esc(formattedDate)
+      })
+    });
+
+    res.json({ ok:true, id: record.id, message:"Mensagem enviada com sucesso para o seu email." });
+  }catch(e){
+    console.error("Email fail:", e.message);
+    res.status(502).json({
+      ok:false,
+      saved:true,
+      error:"Nao foi possivel enviar o email com as credenciais SMTP atuais. Revise o .env e tente novamente."
+    });
+  }
 });
 
 // disponibilidade simples (mock) – você pode integrar com Google Calendar depois
