@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gabriel França — Freelancer Full Stack</title>
+  <meta name="description" content="Portfólio de Gabriel França, freelancer full stack com design futurista e efeitos premium.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Fundo dinâmico -->
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div id="spotlight" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header id="siteHeader" class="nav glass">
+    <a href="#hero" class="brand magnetic">
+      <img class="brand-logo" src="/assets/logo.png" alt="Logo Gabriel França"
+           onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%239B5CFF%22/><stop offset=%22100%25%22 stop-color=%22%236D2CFF%22/></linearGradient></defs><circle cx=%2248%22 cy=%2248%22 r=%2246%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2258%22 font-family=%22Outfit%22 font-size=%2238%22 text-anchor=%22middle%22 fill=%22white%22>GF</text></svg>';">
+      <span>Gabriel França</span>
+    </a>
+    <nav id="mainNav">
+      <a class="magnetic" href="#servicos" data-spy>Serviços</a>
+      <a class="magnetic" href="#projetos" data-spy>Projetos</a>
+      <a class="magnetic" href="#sobre" data-spy>Sobre</a>
+      <a class="magnetic" href="#processo" data-spy>Processo</a>
+      <a class="magnetic" href="#planos" data-spy>Planos</a>
+      <a class="magnetic" href="#contato" data-spy>Contato</a>
+    </nav>
+    <div class="right">
+      <span class="availability badge" id="avail">Checando disponibilidade…</span>
+      <button id="themeToggle" class="theme-toggle magnetic" aria-label="Alternar tema" aria-pressed="false" title="Alternar tema">☾</button>
+    </div>
+  </header>
+
+  <!-- FAB Personalizar (direita, alinhado com o toTop) -->
+  <button id="openCustomizer" class="fab" aria-label="Personalizar tema" aria-pressed="false" title="Personalizar tema">🎛️</button>
+
+  <!-- Voltar ao topo (ESQUERDA) -->
+  <button id="toTop" class="to-top" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
+
+  <!-- Painel de tema -->
+  <aside class="theme-panel glass" id="themePanel" aria-label="Painel de personalização">
+    <div class="tp-head">
+      <h3>Personalizar Tema</h3>
+      <button id="minimizePanel" class="btn tiny ghost" aria-label="Minimizar painel" title="Minimizar">▾</button>
+    </div>
+    <label>Cor Principal <input type="color" id="accentColor" value="#9B5CFF" /></label>
+    <label>Intensidade do Fundo <input type="range" id="bgIntensity" min="0" max="1" step="0.05" value="0.8" /></label>
+    <button id="saveTheme" class="btn small primary">Salvar</button>
+    <button id="resetTheme" class="btn small ghost">Reset</button>
+    <div class="tp-note">A cor principal também recolore o fundo e partículas.</div>
+  </aside>
+
+  <main id="page" style="padding-top:88px">
+    <!-- HERO -->
+    <section id="hero" class="section hero">
+      <div class="hero-left">
+        <h1 class="title neon">
+          <span class="gradient">Gabriel França</span><br/>Freelancer Full&nbsp;Stack
+        </h1>
+        <p class="subtitle">Projetos sob medida, foco em performance e UX.</p>
+
+        <div class="cta">
+          <a href="#contato" class="btn primary magnetic">Vamos conversar</a>
+          <a href="#planos" class="btn ghost magnetic">Ver planos</a>
+          <a href="/assets/logo.png" download class="btn ghost magnetic">Baixar logo</a>
+        </div>
+
+        <!-- Lista simplificada -->
+        <ul class="trust">
+          <li>Entrega rápida</li>
+          <li>Código limpo</li>
+          <li>Suporte por e-mail</li>
+        </ul>
+      </div>
+
+      <!-- MOCK (com templates dinâmicos) -->
+      <div class="hero-right">
+        <div class="hero-card glass tilt mock">
+          <div class="mock-chrome">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <div class="mock-url">https://app.gabrielfranca.dev</div>
+            <div class="mock-actions">
+              <button id="mockPrev" aria-label="Anterior">‹</button>
+              <button id="mockNext" aria-label="Próximo">›</button>
+            </div>
+          </div>
+          <div id="mockBody" class="mock-body" data-variant="dashboard"></div>
+          <div class="mock-badges">
+            <span>Next.js</span><span>Node</span><span>Stripe</span><span>Postgres</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVIÇOS -->
+    <section id="servicos" class="section services">
+      <div class="section-head">
+        <h2 class="neon">Serviços</h2>
+        <p>De landing page a integrações com APIs.</p>
+      </div>
+      <div class="cards">
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Landing/MVP</h3><p>Identidade, copy e deploy em dias.</p>
+        </article>
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Performance</h3><p>Core Web Vitals + acessibilidade.</p>
+        </article>
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Integrações & APIs</h3><p>Pagamentos, CRM e automações.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROJETOS -->
+    <section id="projetos" class="section projects">
+      <div class="section-head">
+        <h2 class="neon">Projetos</h2>
+        <p>Casos com foco em UX e escala.</p>
+      </div>
+      <div class="cards">
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Design System</h3><p>Tokens e componentes.</p>
+          <a class="btn small ghost magnetic" href="#">Abrir</a>
+        </article>
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Realtime Analytics</h3><p>Streams reativos.</p>
+          <a class="btn small ghost magnetic" href="#">Abrir</a>
+        </article>
+        <article class="card tilt glow">
+          <div class="card-media" style="--img:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1400&auto=format&fit=crop')"></div>
+          <h3>Headless Commerce</h3><p>Next.js • Stripe • CMS</p>
+          <a class="btn small ghost magnetic" href="#">Abrir</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- SOBRE + CARROSSEL -->
+    <section id="sobre" class="section about">
+      <div class="section-head">
+        <h2 class="neon">Sobre mim</h2>
+        <p>Full stack com foco em UX, automação e resultados.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-text glass">
+          <p>Sou <b>Gabriel França</b>, apaixonado por transformar ideias em experiências rápidas e elegantes. Stack: <b>TypeScript</b>, <b>React/Next.js</b>, <b>Node</b>, <b>PostgreSQL</b>.</p>
+          <ul class="tags"><li>Next.js</li><li>Node</li><li>PostgreSQL</li><li>Stripe</li><li>CI/CD</li><li>UX</li></ul>
+          <div class="about-cta">
+            <a href="#contato" class="btn primary magnetic">Falar comigo</a>
+            <a href="#" class="btn ghost magnetic">Baixar CV</a>
+          </div>
+        </div>
+
+        <div class="carousel glass" aria-label="Carrossel Sobre Mim">
+          <button class="c-nav prev magnetic" aria-label="Anterior">‹</button>
+          <div class="c-track">
+            <article class="c-slide"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1200&auto=format&fit=crop" alt=""><h3>Código Limpo</h3><p>Padrões e testes.</p></article>
+            <article class="c-slide"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop" alt=""><h3>Colaboração</h3><p>Discovery + protótipos.</p></article>
+            <article class="c-slide"><img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop" alt=""><h3>Performance</h3><p>Core Web Vitals verdes.</p></article>
+          </div>
+          <button class="c-nav next magnetic" aria-label="Próximo">›</button>
+          <div class="c-dots" role="tablist"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESSO -->
+    <section id="processo" class="section process">
+      <div class="section-head">
+        <h2 class="neon">Processo de trabalho</h2>
+        <p>Simples, iterativo e transparente.</p>
+      </div>
+      <ol class="steps">
+        <li class="step glow"><span>1</span><b>Briefing</b><i>alinhamento inicial</i></li>
+        <li class="step glow"><span>2</span><b>Proposta</b><i>escopo + prazos</i></li>
+        <li class="step glow"><span>3</span><b>Kickoff</b><i>setup e milestones</i></li>
+        <li class="step glow"><span>4</span><b>Entrega</b><i>builds frequentes</i></li>
+        <li class="step glow"><span>5</span><b>Go-live</b><i>deploy + suporte</i></li>
+      </ol>
+    </section>
+
+    <!-- PLANOS -->
+    <section id="planos" class="section pricing">
+      <div class="section-head">
+        <h2 class="neon">Planos & Orçamento</h2>
+        <p>Modelos acessíveis para quem está começando.</p>
+      </div>
+      <div class="plans">
+        <div class="plan glass tilt"><h3>Hora</h3><p>Ajustes pontuais.</p><div class="price">R$ 180/h</div><a href="#contato" class="btn small primary magnetic">Reservar</a></div>
+        <div class="plan glass tilt featured"><div class="-badge neon">Mais pedido</div><h3>Diária</h3><p>Foco total.</p><div class="price">R$ 1.200/dia</div><a href="#contato" class="btn small primary magnetic">Fechar</a></div>
+        <div class="plan glass tilt"><h3>Projeto</h3><p>Escopo fechado.</p><div class="price">A partir de R$ 6.000</div><a href="#contato" class="btn small primary magnetic">Briefing</a></div>
+      </div>
+
+      <form id="quoteForm" class="quote glass">
+        <h3>Calcular orçamento</h3>
+        <div class="q-row">
+          <label>Páginas <input type="number" name="pages" min="1" value="3"></label>
+          <label><input type="checkbox" name="cms" checked> CMS/Blog</label>
+          <label><input type="checkbox" name="animations" checked> Animações premium</label>
+          <label><input type="checkbox" name="ecommerce"> E-commerce</label>
+          <label><input type="checkbox" name="seo" checked> SEO técnico</label>
+          <label><input type="checkbox" name="rush"> Urgência</label>
+        </div>
+        <button class="btn primary magnetic" type="submit">Calcular</button>
+        <output id="quoteOut">—</output>
+      </form>
+    </section>
+
+    <!-- CONTATO -->
+    <section id="contato" class="section contact">
+      <div class="section-head">
+        <h2 class="neon">Contato</h2>
+        <p>Me chame e vamos tirar a ideia do papel. ⚡</p>
+      </div>
+      <form id="contactForm" class="glass form-modern">
+        <div class="f-grid">
+          <div class="field">
+            <input id="f-name" name="name" required placeholder=" " />
+            <label for="f-name">Seu nome</label>
+            <span class="icon">👤</span>
+          </div>
+          <div class="field">
+            <input id="f-email" type="email" name="email" required placeholder=" " />
+            <label for="f-email">Seu e-mail</label>
+            <span class="icon">✉️</span>
+          </div>
+          <div class="field">
+            <input id="f-budget" type="number" name="budget" placeholder=" " />
+            <label for="f-budget">Budget (opcional)</label>
+            <span class="icon">💰</span>
+          </div>
+          <div class="field full">
+            <textarea id="f-msg" name="message" rows="5" required placeholder=" "></textarea>
+            <label for="f-msg">Conte sobre o projeto</label>
+            <span class="icon">📝</span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary magnetic" type="submit">Enviar</button>
+          <p class="form-msg" id="formMsg" role="status"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer centralizado -->
+  <footer class="footer glass">
+    <div class="footer-inner">
+      <img src="/assets/logo.png" alt="Logo Gabriel França" class="brand-logo"
+           onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%239B5CFF%22/><stop offset=%22100%25%22 stop-color=%22%236D2CFF%22/></linearGradient></defs><circle cx=%2248%22 cy=%2248%22 r=%2246%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2258%22 font-family=%22Outfit%22 font-size=%2238%22 text-anchor=%22middle%22 fill=%22white%22>GF</text></svg>';">
+      <p class="foot-title">Gabriel França — Full-Stack</p>
+      <nav class="foot-nav">
+        <a href="#servicos">Serviços</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#planos">Planos</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <div class="foot-social">
+        <a aria-label="GitHub" href="#" class="ico">🐙</a>
+        <a aria-label="LinkedIn" href="#" class="ico">💼</a>
+        <a aria-label="Email" href="#contato" class="ico">✉️</a>
+      </div>
+      <small>© <span id="year"></span> Gabriel França. Todos os direitos reservados.</small>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
