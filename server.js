@@ -6,16 +6,22 @@ import nodemailer from "nodemailer";
 
 dotenv.config();
 
+// ===== App config =====
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CONTACT_DESTINATION = "gabrielfrancasimoes@gmail.com";
 const IS_VERCEL = Boolean(process.env.VERCEL);
+const MAX_FIELD_LEN = 160;
+const MAX_MESSAGE_LEN = 4000;
+const CONTACT_RATE_WINDOW_MS = 10 * 60 * 1000;
+const CONTACT_RATE_MAX = 8;
 
 const __dirname = path.resolve();
 const PUBLIC_DIR = path.join(__dirname, "public");
 const ASSETS_DIR = path.join(__dirname, "assets");
 const DATA_DIR = IS_VERCEL ? "/tmp/data" : path.join(__dirname, "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
+const contactRateMap = new Map();
 
 try {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -23,6 +29,14 @@ try {
 } catch (e) {
   console.warn("Lead storage init fail:", e.message);
 }
+
+app.disable("x-powered-by");
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  next();
+});
 
 app.use(express.static(PUBLIC_DIR));
 app.use("/assets", express.static(ASSETS_DIR));
@@ -47,10 +61,28 @@ app.post("/api/quote", (req, res) => {
 });
 
 app.post("/api/contact", async (req, res) => {
-  const { name, email, message, budget } = req.body || {};
-  if (!name || !email || !message) return res.status(400).json({ ok: false, error: "Campos obrigatorios ausentes." });
+  const sourceIp = getClientIp(req);
+  if (!checkContactRateLimit(sourceIp)) {
+    return res.status(429).json({ ok: false, error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." });
+  }
 
-  const record = { id: rid(), name, email, message, budget: budget ?? null, createdAt: new Date().toISOString() };
+  const { name, email, message, budget } = req.body || {};
+  const safeName = sanitizeSingleLine(name, MAX_FIELD_LEN);
+  const safeEmail = sanitizeSingleLine(email, MAX_FIELD_LEN).toLowerCase();
+  const safeMessage = sanitizeMessage(message, MAX_MESSAGE_LEN);
+  const safeBudget = normalizeBudget(budget);
+
+  if (!safeName || !safeEmail || !safeMessage) {
+    return res.status(400).json({ ok: false, error: "Campos obrigatorios ausentes." });
+  }
+  if (!isValidEmail(safeEmail)) {
+    return res.status(400).json({ ok: false, error: "Email invalido." });
+  }
+  if (safeBudget !== null && !Number.isFinite(safeBudget)) {
+    return res.status(400).json({ ok: false, error: "Budget invalido." });
+  }
+
+  const record = { id: rid(), name: safeName, email: safeEmail, message: safeMessage, budget: safeBudget, createdAt: new Date().toISOString() };
   let savedLocally = false;
   try {
     const arr = fs.existsSync(LEADS_FILE) ? JSON.parse(fs.readFileSync(LEADS_FILE, "utf-8")) : [];
@@ -76,7 +108,7 @@ app.post("/api/contact", async (req, res) => {
       host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT || 587), secure: false,
       auth: { user: process.env.SMTP_USER, pass: smtpPass }
     });
-    const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
+    const formattedBudget = safeBudget !== null ? `R$ ${safeBudget.toLocaleString("pt-BR")}` : "Nao informado";
     const formattedDate = new Intl.DateTimeFormat("pt-BR", {
       dateStyle: "full",
       timeStyle: "short",
@@ -86,24 +118,24 @@ app.post("/api/contact", async (req, res) => {
     await transporter.sendMail({
       from: `Portfolio Bot <${process.env.SMTP_USER}>`,
       to: process.env.NOTIFY_TO || CONTACT_DESTINATION,
-      replyTo: email,
-      subject: `Novo lead do portfolio: ${name}`,
+      replyTo: safeEmail,
+      subject: `Novo lead do portfolio: ${safeName}`,
       text: [
         "Novo lead recebido pelo portfolio",
-        `Nome: ${name}`,
-        `Email: ${email}`,
+        `Nome: ${safeName}`,
+        `Email: ${safeEmail}`,
         `Budget: ${formattedBudget}`,
         "",
         "Descricao do projeto:",
-        message,
+        safeMessage,
         "",
         `Recebido em: ${formattedDate}`
       ].join("\n"),
       html: buildContactEmail({
-        name: esc(name),
-        email: esc(email),
+        name: esc(safeName),
+        email: esc(safeEmail),
         budget: esc(formattedBudget),
-        message: esc(message),
+        message: esc(safeMessage),
         createdAt: esc(formattedDate)
       })
     });
@@ -131,6 +163,32 @@ app.get("/api/availability", (req, res) => {
 
 function rid() { return "lead_" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
 function esc(s = "") { return s.replace(/[&<>"'`=\/]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;", "/": "&#x2F;", "`": "&#x60;", "=": "&#x3D;" }[m])); }
+function sanitizeSingleLine(value, maxLen) { return String(value ?? "").replace(/\s+/g, " ").trim().slice(0, maxLen); }
+function sanitizeMessage(value, maxLen) { return String(value ?? "").replace(/\r/g, "").trim().slice(0, maxLen); }
+function normalizeBudget(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return Number.NaN;
+  return Math.round(n);
+}
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+function getClientIp(req) {
+  const xff = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return xff || req.ip || "unknown";
+}
+function checkContactRateLimit(ip) {
+  const now = Date.now();
+  const entry = contactRateMap.get(ip);
+  if (!entry || now > entry.expiresAt) {
+    contactRateMap.set(ip, { count: 1, expiresAt: now + CONTACT_RATE_WINDOW_MS });
+    return true;
+  }
+  entry.count += 1;
+  contactRateMap.set(ip, entry);
+  return entry.count <= CONTACT_RATE_MAX;
+}
 function buildContactEmail({ name, email, budget, message, createdAt }) {
   return `
     <div style="margin:0;padding:24px;background:#f5f1ff;font-family:Arial,Helvetica,sans-serif;color:#181424;">
