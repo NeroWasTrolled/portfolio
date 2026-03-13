@@ -41,21 +41,21 @@ function calcQuote({ pages = 1, cms = false, animations = true, ecommerce = fals
   return Math.round(total);
 }
 
-app.post("/api/quote", (req,res)=>{
-  try{ res.json({ ok:true, currency:"BRL", total: calcQuote(req.body||{}) }); }
-  catch{ res.status(400).json({ ok:false, error:"Invalid payload" }); }
+app.post("/api/quote", (req, res) => {
+  try { res.json({ ok: true, currency: "BRL", total: calcQuote(req.body || {}) }); }
+  catch { res.status(400).json({ ok: false, error: "Invalid payload" }); }
 });
 
-app.post("/api/contact", async (req,res)=>{
+app.post("/api/contact", async (req, res) => {
   const { name, email, message, budget } = req.body || {};
-  if (!name || !email || !message) return res.status(400).json({ ok:false, error:"Campos obrigatorios ausentes." });
+  if (!name || !email || !message) return res.status(400).json({ ok: false, error: "Campos obrigatorios ausentes." });
 
   const record = { id: rid(), name, email, message, budget: budget ?? null, createdAt: new Date().toISOString() };
   let savedLocally = false;
   try {
-    const arr = fs.existsSync(LEADS_FILE) ? JSON.parse(fs.readFileSync(LEADS_FILE,"utf-8")) : [];
+    const arr = fs.existsSync(LEADS_FILE) ? JSON.parse(fs.readFileSync(LEADS_FILE, "utf-8")) : [];
     arr.push(record);
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(arr,null,2));
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(arr, null, 2));
     savedLocally = true;
   } catch (e) {
     console.warn("Lead save fail:", e.message);
@@ -65,16 +65,16 @@ app.post("/api/contact", async (req,res)=>{
   const hasSmtpConfig = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && smtpPass);
   if (!hasSmtpConfig) {
     return res.status(503).json({
-      ok:false,
-      saved:savedLocally,
-      error:"O servidor ainda nao esta configurado para envio de email. Configure as variaveis SMTP no ambiente atual (ex.: Vercel)."
+      ok: false,
+      saved: savedLocally,
+      error: "O servidor ainda nao esta configurado para envio de email. Configure as variaveis SMTP no ambiente atual (ex.: Vercel)."
     });
   }
 
-  try{
+  try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT||587), secure:false,
-      auth:{ user:process.env.SMTP_USER, pass:smtpPass }
+      host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT || 587), secure: false,
+      auth: { user: process.env.SMTP_USER, pass: smtpPass }
     });
     const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
     const formattedDate = new Intl.DateTimeFormat("pt-BR", {
@@ -108,30 +108,30 @@ app.post("/api/contact", async (req,res)=>{
       })
     });
 
-    res.json({ ok:true, id: record.id, message:"Mensagem enviada com sucesso para o seu email." });
-  }catch(e){
+    res.json({ ok: true, id: record.id, message: "Mensagem enviada com sucesso." });
+  } catch (e) {
     console.error("Email fail:", e.message, e.code || "", e.response || "");
     res.status(502).json({
-      ok:false,
-      saved:savedLocally,
-      error:"Nao foi possivel enviar o email com as credenciais SMTP atuais. Revise o .env e tente novamente."
+      ok: false,
+      saved: savedLocally,
+      error: "Nao foi possivel enviar o email com as credenciais SMTP atuais. Revise o .env e tente novamente."
     });
   }
 });
 
 // disponibilidade simples (mock) – você pode integrar com Google Calendar depois
-app.get("/api/availability", (req,res)=>{
+app.get("/api/availability", (req, res) => {
   const today = new Date();
-  const slots = Array.from({length:10}).map((_,i)=>{
-    const d = new Date(today); d.setDate(d.getDate()+i);
-    return { date: d.toISOString().slice(0,10), available: Math.random() > 0.35 };
+  const slots = Array.from({ length: 10 }).map((_, i) => {
+    const d = new Date(today); d.setDate(d.getDate() + i);
+    return { date: d.toISOString().slice(0, 10), available: Math.random() > 0.35 };
   });
-  res.json({ ok:true, slots });
+  res.json({ ok: true, slots });
 });
 
-function rid(){ return "lead_"+Math.random().toString(36).slice(2)+Date.now().toString(36); }
-function esc(s=""){return s.replace(/[&<>"'`=\/]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;","/":"&#x2F;","`":"&#x60;","=":"&#x3D;"}[m]));}
-function buildContactEmail({ name, email, budget, message, createdAt }){
+function rid() { return "lead_" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+function esc(s = "") { return s.replace(/[&<>"'`=\/]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;", "/": "&#x2F;", "`": "&#x60;", "=": "&#x3D;" }[m])); }
+function buildContactEmail({ name, email, budget, message, createdAt }) {
   return `
     <div style="margin:0;padding:24px;background:#f5f1ff;font-family:Arial,Helvetica,sans-serif;color:#181424;">
       <div style="max-width:680px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid rgba(109,44,255,.12);box-shadow:0 24px 60px rgba(46,22,105,.12);">
@@ -170,7 +170,7 @@ function buildContactEmail({ name, email, budget, message, createdAt }){
 }
 
 if (!IS_VERCEL) {
-  app.listen(PORT, ()=> console.log(`🚀 http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 http://localhost:${PORT}`));
 }
 
 export default app;
