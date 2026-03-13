@@ -9,15 +9,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CONTACT_DESTINATION = "gabrielfrancasimoes@gmail.com";
+const IS_VERCEL = Boolean(process.env.VERCEL);
 
 const __dirname = path.resolve();
 const PUBLIC_DIR = path.join(__dirname, "public");
 const ASSETS_DIR = path.join(__dirname, "assets");
-const DATA_DIR = path.join(__dirname, "data");
+const DATA_DIR = IS_VERCEL ? "/tmp/data" : path.join(__dirname, "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-if (!fs.existsSync(LEADS_FILE)) fs.writeFileSync(LEADS_FILE, "[]", "utf-8");
+try {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(LEADS_FILE)) fs.writeFileSync(LEADS_FILE, "[]", "utf-8");
+} catch (e) {
+  console.warn("Lead storage init fail:", e.message);
+}
 
 app.use(express.static(PUBLIC_DIR));
 app.use("/assets", express.static(ASSETS_DIR));
@@ -46,16 +51,23 @@ app.post("/api/contact", async (req,res)=>{
   if (!name || !email || !message) return res.status(400).json({ ok:false, error:"Campos obrigatorios ausentes." });
 
   const record = { id: rid(), name, email, message, budget: budget ?? null, createdAt: new Date().toISOString() };
-  const arr = JSON.parse(fs.readFileSync(LEADS_FILE,"utf-8")); arr.push(record);
-  fs.writeFileSync(LEADS_FILE, JSON.stringify(arr,null,2));
+  let savedLocally = false;
+  try {
+    const arr = fs.existsSync(LEADS_FILE) ? JSON.parse(fs.readFileSync(LEADS_FILE,"utf-8")) : [];
+    arr.push(record);
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(arr,null,2));
+    savedLocally = true;
+  } catch (e) {
+    console.warn("Lead save fail:", e.message);
+  }
 
   const smtpPass = (process.env.SMTP_PASS || "").replace(/\s+/g, "");
   const hasSmtpConfig = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && smtpPass);
   if (!hasSmtpConfig) {
     return res.status(503).json({
       ok:false,
-      saved:true,
-      error:"O servidor ainda nao esta configurado para envio de email. Preencha o arquivo .env com as credenciais SMTP."
+      saved:savedLocally,
+      error:"O servidor ainda nao esta configurado para envio de email. Configure as variaveis SMTP no ambiente atual (ex.: Vercel)."
     });
   }
 
@@ -98,10 +110,10 @@ app.post("/api/contact", async (req,res)=>{
 
     res.json({ ok:true, id: record.id, message:"Mensagem enviada com sucesso para o seu email." });
   }catch(e){
-    console.error("Email fail:", e.message);
+    console.error("Email fail:", e.message, e.code || "", e.response || "");
     res.status(502).json({
       ok:false,
-      saved:true,
+      saved:savedLocally,
       error:"Nao foi possivel enviar o email com as credenciais SMTP atuais. Revise o .env e tente novamente."
     });
   }
@@ -157,4 +169,8 @@ function buildContactEmail({ name, email, budget, message, createdAt }){
   `;
 }
 
-app.listen(PORT, ()=> console.log(`🚀 http://localhost:${PORT}`));
+if (!IS_VERCEL) {
+  app.listen(PORT, ()=> console.log(`🚀 http://localhost:${PORT}`));
+}
+
+export default app;
