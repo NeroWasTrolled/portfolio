@@ -49,10 +49,11 @@ function bindPressFeedback(targets){
   // 🎛️ FAB abre/fecha o painel (minimiza e aumenta)
   openBtn.addEventListener("click", ()=>{
     const isOpen = panel.classList.toggle("open");
+    if (isOpen && panel.classList.contains("min")) setMinimized(false);
     openBtn.setAttribute("aria-pressed", String(isOpen));
   });
   // botão interno "▾" apenas colapsa conteúdo sem fechar totalmente
-  minBtn.addEventListener("click", ()=> panel.classList.toggle("min"));
+  minBtn.addEventListener("click", ()=> setMinimized(!panel.classList.contains("min")));
 
   // controles
   accent.addEventListener("input", e=> { applyAccent(e.target.value); persist(); });
@@ -68,13 +69,22 @@ function bindPressFeedback(targets){
   });
   addEventListener("resize", ()=>{
     if (!isTouchLike()) return;
-    panel.classList.remove("min");
+    setMinimized(false);
   }, {passive:true});
+
+  setMinimized(false);
 
   function persist(){
     localStorage.setItem("theme_prefs",
       JSON.stringify({ theme: root.getAttribute("data-theme"), accent: accent.value, bgInt: parseFloat(bgInt.value) })
     );
+  }
+  function setMinimized(minimized){
+    panel.classList.toggle("min", minimized);
+    minBtn.setAttribute("aria-pressed", String(minimized));
+    minBtn.setAttribute("aria-label", minimized ? "Expandir painel" : "Minimizar painel");
+    minBtn.title = minimized ? "Expandir" : "Minimizar";
+    minBtn.textContent = minimized ? "▴" : "▾";
   }
   function applyAccent(hex){
     const {h,s,l} = hexToHSL(hex);
@@ -354,25 +364,25 @@ setupCarousel(".carousel");
 
     if(v==="dashboard"){
       const stats = [
-        {k:"MRR", v:"R$ 28.400", delta:"+8%"},
-        {k:"Users", v:"12.940",  delta:"+3%"},
-        {k:"Churn", v:"2.1%",    delta:"-0.2%"}
+        {k:"Tarefas", v:"124", delta:"+18"},
+        {k:"Rotinas", v:"38",  delta:"+6"},
+        {k:"Economia", v:"42h", delta:"/ mes"}
       ];
       body.innerHTML = `
         <div class="mb-header">
-          <div class="mb-title">Analytics • Últimos 30 dias</div>
-          <div style="opacity:.8">⚡ Live</div>
+          <div class="mb-title">Dashboard operacional • Últimos 30 dias</div>
+          <div style="opacity:.8">Atualizado</div>
         </div>
         <div class="mb-stats">
           ${stats.map(s=>`<div class="mb-card"><small>${s.k}</small><br><b>${s.v}</b><br><small>${s.delta}</small></div>`).join("")}
         </div>
         <div class="mb-chart">${lineChartSVG(24, accent, chartFrame)}</div>
         <table class="mb-table">
-          <thead><tr><th>Canal</th><th>Leads</th><th>CVR</th><th>Receita</th></tr></thead>
+          <thead><tr><th>Módulo</th><th>Status</th><th>Linguagem</th><th>Impacto</th></tr></thead>
           <tbody>
-            <tr><td>Orgânico</td><td>412</td><td>7.8%</td><td>R$ 9.4k</td></tr>
-            <tr><td>Ads</td><td>280</td><td>5.3%</td><td>R$ 7.1k</td></tr>
-            <tr><td>Indicações</td><td>96</td><td>12.4%</td><td>R$ 5.2k</td></tr>
+            <tr><td>Cadastro</td><td>Concluído</td><td>C#</td><td>Controle centralizado</td></tr>
+            <tr><td>Relatórios</td><td>Concluído</td><td>Python</td><td>Redução de tarefas manuais</td></tr>
+            <tr><td>Painel Web</td><td>Em evolução</td><td>Vue.js</td><td>Mais visibilidade dos dados</td></tr>
           </tbody>
         </table>
       `;
@@ -380,17 +390,17 @@ setupCarousel(".carousel");
     if(v==="landing"){
       body.innerHTML = `
         <section class="l-hero">
-          <div class="l-title">Aumente receita com um checkout de alta conversão</div>
-          <div style="color:var(--muted)">SDK pronto para React/Next.js • Webhooks Node • PCI compliant</div>
+          <div class="l-title">Sistema e automação para organizar sua operação</div>
+          <div style="color:var(--muted)">Vue.js • JavaScript • PHP • APIs externas</div>
           <div class="l-cta">
-            <button class="btn-mini">Começar grátis</button>
-            <button class="btn-mini ghost">Ver docs</button>
+            <button class="btn-mini">Solicitar orçamento</button>
+            <button class="btn-mini ghost">Ver escopo</button>
           </div>
         </section>
         <div class="l-features">
-          <div class="mb-card">⚡ Webhooks</div>
-          <div class="mb-card">🔒 3DS</div>
-          <div class="mb-card">🌍 Multi-moeda</div>
+          <div class="mb-card">📊 Dashboard</div>
+          <div class="mb-card">🤖 Automação</div>
+          <div class="mb-card">🧩 Integrações</div>
         </div>
       `;
     }
@@ -400,7 +410,7 @@ setupCarousel(".carousel");
           <input type="email" placeholder="email@empresa.com" required />
           <input type="password" placeholder="senha" required />
           <button>Entrar</button>
-          <div class="hint">SSO • OAuth • TOTP</div>
+          <div class="hint">CRUD • Permissões • Auditoria</div>
         </form>
       `;
     }

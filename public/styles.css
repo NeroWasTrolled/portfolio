@@ -90,6 +90,7 @@ html[data-theme="light"]{
 html,body{height:100%}
 html{ scroll-behavior:smooth }
 body{ margin:0; font-family:"Outfit",system-ui,Segoe UI,Roboto,Arial; color:var(--text); overflow-x:hidden }
+html, body{ overflow-x:hidden }
 img{ max-width:100%; display:block }
 button,input,textarea,select{ font:inherit }
 #page{ padding-top:var(--header-offset)!important }
@@ -177,8 +178,10 @@ body::before{
   transform-origin:100% 100%; transition:.25s transform,.25s opacity; z-index:5000; box-shadow:0 20px 60px #000a
 }
 .theme-panel:not(.open){ transform:scale(.98) translateY(10px); opacity:0; pointer-events:none }
-.theme-panel.min{ height:44px; overflow:hidden }
+.theme-panel.min{ max-height:56px; overflow:hidden; gap:0 }
+.theme-panel.min > :not(.tp-head){ display:none }
 .theme-panel .tp-head{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+.theme-panel .tp-head h3{ margin:0; font-size:1rem; line-height:1.2 }
 .theme-panel label{ display:grid; gap:var(--space-2); font-size:.95rem }
 .tp-note{ color:var(--muted); font-size:.9rem; line-height:1.45 }
 
@@ -190,11 +193,21 @@ body::before{
 
 /* Hero + Mock */
 .hero{ display:grid; grid-template-columns:1.2fr .8fr; gap:var(--space-6); align-items:center; min-height:72vh }
+.hero-left,
+.hero-right{ min-width:0 }
 .title{ font-size: clamp(36px, 6vw, 64px); line-height:1.05; margin:0 0 10px }
 .subtitle{ color:var(--muted); margin:var(--space-2) 0 var(--space-4) }
 .cta{ display:flex; gap:var(--space-3); flex-wrap:wrap }
-.trust{ margin:var(--space-4) 0 0; padding:0; list-style: "✔️ "; color:var(--muted) }
-.trust li{ margin:4px 0 }
+.trust{ margin:var(--space-4) 0 0; padding:0; list-style:none; color:var(--muted); display:grid; gap:6px }
+.trust li{ position:relative; margin:0; padding-left:24px; line-height:1.4 }
+.trust li::before{
+  content:"✔";
+  position:absolute;
+  left:0;
+  top:.1em;
+  font-weight:700;
+  color:color-mix(in srgb, var(--accent) 80%, #9bf0c6);
+}
 
 .mock{ position:relative; overflow:hidden }
 .hero-card{ will-change:transform }
@@ -220,8 +233,9 @@ body::before{
 .mb-card{ background:var(--surface-3); border:1px solid var(--border); border-radius:12px; padding:10px; }
 .mb-card small{ color:var(--muted) }
 .mb-card b{ font-size:1.3rem }
-.mb-chart{ background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:6px; margin-bottom:12px }
-.mb-table{ width:100%; border-collapse:collapse; font-size:.9rem }
+.mb-chart{ background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:6px; margin-bottom:12px; overflow:hidden; max-width:100% }
+.mb-chart svg{ display:block; width:100%; max-width:100%; height:auto }
+.mb-table{ width:100%; max-width:100%; border-collapse:collapse; font-size:.9rem; table-layout:fixed }
 .mb-table th,.mb-table td{ padding:8px 10px; border-bottom:1px dashed color-mix(in srgb, var(--accent) 25%, transparent) }
 .mb-table th{ text-align:left; color:var(--muted); font-weight:600 }
 
@@ -377,7 +391,7 @@ body::before{
   .mock-chrome{ flex-wrap:wrap }
   .mock-url{ order:2; width:100% }
   .mock-actions{ margin-left:auto }
-  .mb-table{ display:block; overflow-x:auto; white-space:nowrap }
+  .mb-table{ display:block; max-width:100%; overflow-x:auto; white-space:nowrap }
 }
 @media (max-width:640px){
   :root{ --header-offset:136px }
@@ -399,7 +413,7 @@ body::before{
   .form-modern,
   .about .about-text{ padding:var(--space-4) }
   .theme-panel{ left:var(--space-3); right:var(--space-3); bottom:72px; width:auto; border-radius:var(--radius-xl) }
-  .theme-panel.min{ height:52px }
+  .theme-panel.min{ max-height:56px }
   .theme-panel .btn{ width:100% }
   .mock-badges{ position:static; margin-top:var(--space-3) }
   .footer{ margin:var(--space-6) var(--space-3); padding:var(--space-4) }
@@ -409,15 +423,33 @@ body::before{
   .to-top{ left:var(--space-4) }
 }
 @media (max-width:480px){
-  :root{ --header-offset:144px }
+  :root{ --header-offset:188px }
   .nav{ top:var(--space-3); left:var(--space-3); right:var(--space-3); padding:var(--space-2) }
   .brand{ width:100%; justify-content:center }
   .right{ gap:var(--space-2); justify-content:center }
+  #mainNav{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    width:100%;
+    gap:6px;
+    overflow:visible;
+    padding-bottom:0;
+  }
+  #mainNav a{
+    font-size:.84rem;
+    padding:6px 10px;
+    line-height:1.2;
+    min-width:0;
+    text-align:center;
+    white-space:normal;
+  }
   .availability{ width:100%; justify-content:center; text-align:center }
-  #mainNav a{ font-size:.92rem }
+  .theme-toggle{ min-width:40px; min-height:40px; padding:6px 10px }
   .hero{ min-height:auto }
-  .hero-right{ order:-1 }
+  .hero-right{ order:0 }
+  .title{ font-size:clamp(28px, 8.5vw, 40px); line-height:1.08; overflow-wrap:anywhere }
   .cta{ gap:var(--space-2) }
+  .fab{ display:none }
   .section-head{ margin-bottom:var(--space-6) }
   .section-head p{ max-width:34ch; margin:0 auto }
   .c-nav.prev{ right:52px }

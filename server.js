@@ -12,6 +12,7 @@ const CONTACT_DESTINATION = "gabrielfrancasimoes@gmail.com";
 
 const __dirname = path.resolve();
 const PUBLIC_DIR = path.join(__dirname, "public");
+const ASSETS_DIR = path.join(__dirname, "assets");
 const DATA_DIR = path.join(__dirname, "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
@@ -19,10 +20,11 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 if (!fs.existsSync(LEADS_FILE)) fs.writeFileSync(LEADS_FILE, "[]", "utf-8");
 
 app.use(express.static(PUBLIC_DIR));
+app.use("/assets", express.static(ASSETS_DIR));
 app.use(express.json({ limit: "1mb" }));
 
 const PRICING = {
-  base: 900, pages: 300, cms: 600, animations: 450, ecommerce: 1600, seo: 350, rushMultiplier: 1.35
+  base: 350, pages: 120, cms: 180, animations: 90, ecommerce: 700, seo: 120, rushMultiplier: 1.2
 };
 function calcQuote({ pages = 1, cms = false, animations = true, ecommerce = false, seo = true, rush = false }) {
   let total = PRICING.base + Math.max(0, pages - 1) * PRICING.pages;
@@ -47,7 +49,8 @@ app.post("/api/contact", async (req,res)=>{
   const arr = JSON.parse(fs.readFileSync(LEADS_FILE,"utf-8")); arr.push(record);
   fs.writeFileSync(LEADS_FILE, JSON.stringify(arr,null,2));
 
-  const hasSmtpConfig = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  const smtpPass = (process.env.SMTP_PASS || "").replace(/\s+/g, "");
+  const hasSmtpConfig = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && smtpPass);
   if (!hasSmtpConfig) {
     return res.status(503).json({
       ok:false,
@@ -59,7 +62,7 @@ app.post("/api/contact", async (req,res)=>{
   try{
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT||587), secure:false,
-      auth:{ user:process.env.SMTP_USER, pass:process.env.SMTP_PASS }
+      auth:{ user:process.env.SMTP_USER, pass:smtpPass }
     });
     const formattedBudget = budget ? `R$ ${Number(budget).toLocaleString("pt-BR")}` : "Nao informado";
     const formattedDate = new Intl.DateTimeFormat("pt-BR", {
