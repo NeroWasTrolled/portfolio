@@ -78,5 +78,21 @@
     "message": "Teste",
     "budget": 5000,
     "createdAt": "2026-03-13T11:36:11.545Z"
+  },
+  {
+    "id": "lead_azjmxn0trphmrkmrz3z",
+    "name": "Teste Auto",
+    "email": "teste@example.com",
+    "message": "Preciso de dashboard e automacao em python urgente",
+    "budget": 1200,
+    "createdAt": "2026-07-14T12:31:53.471Z"
+  },
+  {
+    "id": "lead_nff6m6cjabbmrkmv5rk",
+    "name": "Gabriel França Dutra Simões",
+    "email": "gabriel.simoes@unicv.edu.br",
+    "message": "Teste",
+    "budget": 200,
+    "createdAt": "2026-07-14T12:34:22.064Z"
   }
 ]

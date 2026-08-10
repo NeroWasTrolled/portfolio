@@ -4,180 +4,275 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Gabriel França — Freelancer Full Stack</title>
+  <title>Gabriel França - Freelancer Full Stack</title>
   <meta name="description"
-    content="Portfólio de Gabriel França: dashboards, automações em Python e sistemas web com C#, Vue, PHP, HTML/CSS e JavaScript.">
+    content="Gabriel França entrega dashboards, automações em Python e sistemas web prontos para o dia a dia de pequenas empresas. C#, Vue, PHP e JavaScript.">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <!-- Fundo dinâmico -->
-  <canvas id="bg" aria-hidden="true"></canvas>
-  <div id="spotlight" aria-hidden="true"></div>
+  <a class="skip-link" href="#page">Ir para o conteúdo</a>
 
-  <!-- Header -->
+  <div class="grain" aria-hidden="true"></div>
+
   <header id="siteHeader" class="nav glass">
     <a href="#hero" class="brand magnetic">
-      <img class="brand-logo" src="/assets/logo.png" alt="Logo Gabriel França"
-        onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%239B5CFF%22/><stop offset=%22100%25%22 stop-color=%22%236D2CFF%22/></linearGradient></defs><circle cx=%2248%22 cy=%2248%22 r=%2246%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2258%22 font-family=%22Outfit%22 font-size=%2238%22 text-anchor=%22middle%22 fill=%22white%22>GF</text></svg>';">
+      <img class="brand-logo" src="/assets/logo-mark.png" alt="Logo Gabriel França"
+        onerror="this.onerror=null;this.src='/assets/favicon-32.png';">
       <span>Gabriel França</span>
     </a>
-    <nav id="mainNav">
+
+    <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="mainNav"
+      aria-label="Abrir menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+
+    <nav id="mainNav" class="main-nav">
       <a class="magnetic" href="#servicos" data-spy>Serviços</a>
-      <a class="magnetic" href="#projetos" data-spy>Projetos</a>
+      <a class="magnetic" href="#projetos" data-spy>Escopos</a>
       <a class="magnetic" href="#sobre" data-spy>Sobre</a>
       <a class="magnetic" href="#processo" data-spy>Processo</a>
       <a class="magnetic" href="#planos" data-spy>Planos</a>
       <a class="magnetic" href="#contato" data-spy>Contato</a>
     </nav>
+
     <div class="right">
       <span class="availability badge" id="avail">Checando disponibilidade…</span>
       <button id="themeToggle" class="theme-toggle magnetic" aria-label="Alternar tema" aria-pressed="false"
-        title="Alternar tema">☾</button>
+        title="Alternar tema">
+        <i class="ph ph-moon" aria-hidden="true"></i>
+      </button>
     </div>
   </header>
 
-  <!-- FAB Personalizar (direita, alinhado com o toTop) -->
-  <button id="openCustomizer" class="fab" aria-label="Personalizar tema" aria-pressed="false"
-    title="Personalizar tema">🎛️</button>
+  <button id="toTop" class="to-top" aria-label="Voltar ao topo" title="Voltar ao topo">
+    <i class="ph ph-caret-up" aria-hidden="true"></i>
+  </button>
 
-  <!-- Voltar ao topo (ESQUERDA) -->
-  <button id="toTop" class="to-top" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
-
-  <!-- Painel de tema -->
-  <aside class="theme-panel glass" id="themePanel" aria-label="Painel de personalização">
-    <div class="tp-head">
-      <h3>Personalizar Tema</h3>
-      <button id="minimizePanel" class="btn tiny ghost" aria-label="Minimizar painel" title="Minimizar">▾</button>
-    </div>
-    <label>Cor Principal <input type="color" id="accentColor" value="#9B5CFF" /></label>
-    <label>Intensidade do Fundo <input type="range" id="bgIntensity" min="0" max="1" step="0.05" value="0.8" /></label>
-    <button id="saveTheme" class="btn small primary">Salvar</button>
-    <button id="resetTheme" class="btn small ghost">Reset</button>
-    <div class="tp-note">A cor principal também recolore o fundo e partículas.</div>
-  </aside>
-
-  <main id="page" style="padding-top:88px">
-    <!-- HERO -->
+  <main id="page">
     <section id="hero" class="section hero">
       <div class="hero-left">
-        <h1 class="title neon">
-          <span class="gradient">Gabriel França</span><br />Freelancer Full Stack
+        <h1 class="title">
+          <span class="gradient">Gabriel França</span>
         </h1>
-        <p class="subtitle">Dashboards, automações e sistemas web sob medida para pequenas empresas.</p>
-
+        <p class="subtitle">Eu monto o painel, a rotina e o sistema que tiram o trabalho manual do seu dia a dia.</p>
         <div class="cta">
-          <a href="https://wa.me/5544997135259" target="_blank" rel="noreferrer" class="btn primary magnetic">Vamos
-            conversar</a>
-          <a href="#planos" class="btn ghost magnetic">Ver planos</a>
+          <a href="https://wa.me/5544997135259" target="_blank" rel="noreferrer" class="btn primary magnetic">
+            Vamos conversar
+          </a>
+          <a href="#projetos" class="btn ghost magnetic">Ver escopos</a>
         </div>
-
-        <!-- Lista simplificada -->
-        <ul class="trust">
-          <li>Valores acessíveis para negócios em início</li>
-          <li>Entrega incremental e transparente</li>
-          <li>Suporte por WhatsApp e e-mail</li>
-        </ul>
       </div>
 
-      <!-- MOCK (com templates dinâmicos) -->
       <div class="hero-right">
-        <div class="hero-card glass tilt mock">
+        <div class="hero-card glass mock">
           <div class="mock-chrome">
             <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-            <div class="mock-url">https://app.gabrielfranca.dev</div>
+            <div class="mock-url">painel.exemplo</div>
             <div class="mock-actions">
-              <button id="mockPrev" aria-label="Anterior">‹</button>
-              <button id="mockNext" aria-label="Próximo">›</button>
+              <button id="mockPrev" aria-label="Anterior"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
+              <button id="mockNext" aria-label="Próximo"><i class="ph ph-caret-right" aria-hidden="true"></i></button>
             </div>
           </div>
           <div id="mockBody" class="mock-body" data-variant="dashboard"></div>
-          <div class="mock-badges">
-            <span>C#</span><span>Python</span><span>Vue.js</span><span>PHP</span>
-          </div>
         </div>
+        <p class="mock-caption">Exemplo do tipo de tela que eu entrego (ilustrativo).</p>
       </div>
     </section>
 
-    <!-- SERVIÇOS -->
+    <section id="pacote" class="section package" aria-label="O que você leva">
+      <div class="section-head">
+        <h2>O que você leva</h2>
+        <p>Não é só código. É o sistema rodando, com acesso, explicação e caminho para evoluir.</p>
+      </div>
+      <div class="package-grid">
+        <article class="package-item">
+          <span class="package-kicker">01</span>
+          <h3>Sistema no ar</h3>
+          <p>Deploy em ambiente que você acessa. Link, login e painel usável no dia a dia.</p>
+        </article>
+        <article class="package-item">
+          <span class="package-kicker">02</span>
+          <h3>Código e acesso</h3>
+          <p>Repositório ou pasta organizada, com o que foi feito e como abrir de novo.</p>
+        </article>
+        <article class="package-item">
+          <span class="package-kicker">03</span>
+          <h3>Rotinas que economizam tempo</h3>
+          <p>Scripts e integrações que consolidam planilha, e-mail ou relatório sem digitação repetida.</p>
+        </article>
+        <article class="package-item package-item--wide">
+          <span class="package-kicker">04</span>
+          <h3>Alinhamento pelo WhatsApp</h3>
+          <p>Entrega em pedaços: você vê funcionar cedo, aponta o ajuste e a gente itera sem sumiço.</p>
+        </article>
+      </div>
+    </section>
+
     <section id="servicos" class="section services">
       <div class="section-head">
-        <h2 class="neon">Serviços</h2>
-        <p>Soluções sob medida para operações reais do dia a dia.</p>
+        <h2>Serviços</h2>
+        <p>Três tipos de entrega. Em todos, o foco é operação real, não slide bonito.</p>
       </div>
-      <div class="cards">
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1400&auto=format&fit=crop')">
+
+      <div class="capability-list">
+        <article class="capability">
+          <div class="capability-meta">
+            <span class="mono-label">Painel</span>
+            <h3>Dashboards web</h3>
+            <p>Você para de caçar número em planilha. Vê venda, meta e status num único lugar.</p>
           </div>
-          <h3>Dashboards Web</h3>
-          <p>Painéis com métricas e visualização clara para tomada de decisão.</p>
+          <ul class="deliverables">
+            <li>Indicadores por período e filtro</li>
+            <li>Visão clara para dono e equipe</li>
+            <li>Base pronta para crescer métricas</li>
+          </ul>
         </article>
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1400&auto=format&fit=crop')">
+
+        <article class="capability">
+          <div class="capability-meta">
+            <span class="mono-label">Automação</span>
+            <h3>Rotinas em Python</h3>
+            <p>Relatório que ia embora horas manuais vira job. Roda, consolida e avisa.</p>
           </div>
-          <h3>Automações em Python</h3>
-          <p>Rotinas para relatórios, integrações e redução de trabalho manual.</p>
+          <ul class="deliverables">
+            <li>Leitura e junção de fontes</li>
+            <li>Envio por e-mail ou arquivo pronto</li>
+            <li>Menos erro humano na repetição</li>
+          </ul>
         </article>
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1400&auto=format&fit=crop')">
+
+        <article class="capability">
+          <div class="capability-meta">
+            <span class="mono-label">Sistema</span>
+            <h3>CRUD e gestão</h3>
+            <p>Cadastro, login e controle no fluxo da sua operação, com stack que cabe no orçamento.</p>
           </div>
-          <h3>Sistemas CRUD</h3>
-          <p>Aplicações completas com C#, PHP e banco de dados.</p>
+          <ul class="deliverables">
+            <li>Telas de cadastro e listagem</li>
+            <li>Permissões e autenticação</li>
+            <li>Banco e manutenção simples</li>
+          </ul>
         </article>
       </div>
     </section>
 
-    <!-- PROJETOS -->
     <section id="projetos" class="section projects">
       <div class="section-head">
-        <h2 class="neon">Projetos</h2>
-        <p>Exemplos de soluções que resolvem problemas práticos.</p>
+        <h2>Escopos típicos</h2>
+        <p>Não são cases inventados de cliente X. São formatos de trabalho que eu atendo, com faixa e limite claros.</p>
       </div>
-      <div class="cards">
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1400&auto=format&fit=crop')">
+
+      <div class="case-stack">
+        <article class="case glass">
+          <div class="case-preview case-preview--shot">
+            <img
+              src="/assets/painel-comercial.jpg"
+              alt="Print do Painel Comercial: visão geral com KPIs, gráfico de receita e formulário de venda"
+              width="1600"
+              height="1118"
+              loading="lazy"
+              decoding="async"
+            >
           </div>
-          <h3>Dashboard Comercial</h3>
-          <p>Indicadores de vendas, metas e performance por período.</p>
-          <a class="btn small ghost magnetic" href="#">Abrir</a>
+          <div class="case-body">
+            <span class="mono-label">Escopo · Dashboard</span>
+            <h3>Painel comercial simples</h3>
+            <p class="case-band">Faixa comum: 1 a 2 semanas · a partir de R$ 850</p>
+            <dl class="case-facts">
+              <div>
+                <dt>Quando faz sentido</dt>
+                <dd>Venda e meta espalhadas em planilha e WhatsApp. Você quer ver a semana num lugar só.</dd>
+              </div>
+              <div>
+                <dt>O que entra</dt>
+                <dd>Painel web (Vue + Python), filtros por período, KPIs, ranking, CRUD de vendas e deploy para uso diário.</dd>
+              </div>
+              <div>
+                <dt>O que fica de fora</dt>
+                <dd>BI corporativo, data warehouse e integração com dezenas de sistemas.</dd>
+              </div>
+            </dl>
+            <a class="text-link magnetic" href="#contato">Pedir este formato</a>
+          </div>
         </article>
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=1400&auto=format&fit=crop')">
+
+        <article class="case glass case--flip">
+          <div class="case-preview case-preview--auto" aria-hidden="true">
+            <div class="case-preview-term">
+              <code>$ python relatorio.py</code>
+              <code class="ok">ok · fontes lidas · arquivo pronto</code>
+            </div>
           </div>
-          <h3>Automação de Relatórios</h3>
-          <p>Scripts Python para consolidar dados e enviar resultados.</p>
-          <a class="btn small ghost magnetic" href="#">Abrir</a>
+          <div class="case-body">
+            <span class="mono-label">Escopo · Python</span>
+            <h3>Automação de fechamento</h3>
+            <p class="case-band">Faixa comum: alguns dias · a partir de R$ 650</p>
+            <dl class="case-facts">
+              <div>
+                <dt>Quando faz sentido</dt>
+                <dd>Toda semana alguém perde manhã copiando CSV ou planilha para montar o mesmo relatório.</dd>
+              </div>
+              <div>
+                <dt>O que entra</dt>
+                <dd>Script que lê as fontes, consolida, gera arquivo e pode disparar e-mail ou pasta compartilhada.</dd>
+              </div>
+              <div>
+                <dt>O que fica de fora</dt>
+                <dd>Orquestração enterprise, fila em nuvem paga e monitoramento 24h (combinamos à parte).</dd>
+              </div>
+            </dl>
+            <a class="text-link magnetic" href="#contato">Pedir este formato</a>
+          </div>
         </article>
-        <article class="card tilt glow">
-          <div class="card-media"
-            style="--img:url('https://images.unsplash.com/photo-1526379095098-d400fd0bf935?q=80&w=1400&auto=format&fit=crop')">
+
+        <article class="case glass">
+          <div class="case-preview case-preview--crud" aria-hidden="true">
+            <div class="case-preview-table">
+              <div></div><div></div><div></div>
+              <div></div><div></div><div></div>
+            </div>
           </div>
-          <h3>Sistema de Gestão</h3>
-          <p>CRUD completo com autenticação e controle de usuários.</p>
-          <a class="btn small ghost magnetic" href="#">Abrir</a>
+          <div class="case-body">
+            <span class="mono-label">Escopo · Sistema</span>
+            <h3>CRUD de gestão</h3>
+            <p class="case-band">Faixa comum: 2 a 4 semanas · a partir de R$ 1.200</p>
+            <dl class="case-facts">
+              <div>
+                <dt>Quando faz sentido</dt>
+                <dd>Cadastro e controle ainda estão no improviso. A equipe precisa de login, lista e edição basicamente estáveis.</dd>
+              </div>
+              <div>
+                <dt>O que entra</dt>
+                <dd>Telas CRUD, autenticação, papéis simples, banco e handoff com código organizado.</dd>
+              </div>
+              <div>
+                <dt>O que fica de fora</dt>
+                <dd>App mobile nativo, ERP completo e regras contábeis/fiscais complexas.</dd>
+              </div>
+            </dl>
+            <a class="text-link magnetic" href="#contato">Pedir este formato</a>
+          </div>
         </article>
       </div>
     </section>
 
-    <!-- SOBRE + CARROSSEL -->
     <section id="sobre" class="section about">
-      <div class="section-head">
-        <h2 class="neon">Sobre mim</h2>
-        <p>Desenvolvedor freelancer com foco em soluções úteis e acessíveis.</p>
-      </div>
-      <div class="about-grid">
-        <div class="about-text glass">
-          <p>Sou <b>Gabriel França</b> e trabalho com <b>C#</b>, <b>Python</b>, <b>Vue.js</b>, <b>JavaScript</b>,
-            <b>HTML/CSS</b> e <b>PHP</b>. Desenvolvo dashboards, automações e sistemas completos com foco em desempenho
-            e simplicidade.</p>
+      <div class="about-split">
+        <div class="about-copy">
+          <h2>Sobre mim</h2>
+          <p class="about-lead">Sou Gabriel França. Trabalho com pequenas operações que precisam de sistema útil, preço claro e resposta rápida.</p>
+          <p>Stack que uso no dia a dia: <b>C#</b>, <b>Python</b>, <b>Vue.js</b>, <b>JavaScript</b>, <b>PHP</b> e <b>HTML/CSS</b>. Escolho ferramenta pelo problema.</p>
           <ul class="tags">
             <li>C#</li>
             <li>Python</li>
@@ -187,149 +282,232 @@
             <li>HTML/CSS</li>
           </ul>
           <div class="about-cta">
-            <a href="#contato" class="btn primary magnetic">Falar comigo</a>
+            <a href="#contato" class="btn primary magnetic">Vamos conversar</a>
             <a href="mailto:gabrielfrancasimoes@gmail.com?subject=Solicitacao%20de%20CV%20em%20PDF&body=Oi%20Gabriel%2C%20pode%20me%20enviar%20seu%20CV%20em%20PDF%3F"
-              class="btn ghost magnetic">Solicitar CV (PDF)</a>
+              class="btn ghost magnetic">Solicitar CV</a>
           </div>
         </div>
 
-        <div class="carousel glass" aria-label="Carrossel Sobre Mim">
-          <button class="c-nav prev magnetic" aria-label="Anterior">‹</button>
-          <div class="c-track">
-            <article class="c-slide"><img
-                src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200&auto=format&fit=crop"
-                alt="Tela com código em desenvolvimento">
-              <h3>Código Limpo</h3>
-              <p>Padrões e testes.</p>
-            </article>
-            <article class="c-slide"><img
-                src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop"
-                alt="Planejamento técnico em equipe">
-              <h3>Colaboração</h3>
-              <p>Discovery + protótipos.</p>
-            </article>
-            <article class="c-slide"><img
-                src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1200&auto=format&fit=crop"
-                alt="Análise de performance em projeto web">
-              <h3>Performance</h3>
-              <p>Core Web Vitals verdes.</p>
-            </article>
-          </div>
-          <button class="c-nav next magnetic" aria-label="Próximo">›</button>
-          <div class="c-dots" role="tablist"></div>
-        </div>
+        <aside class="about-cred glass" aria-label="Como eu trabalho">
+          <h3>Como eu trabalho</h3>
+          <ul class="cred-list">
+            <li>
+              <i class="ph ph-chat-teardrop-text" aria-hidden="true"></i>
+              <div>
+                <b>Conversa direta</b>
+                <span>Briefing e ajustes pelo WhatsApp. Sem intermediário e sem sumir.</span>
+              </div>
+            </li>
+            <li>
+              <i class="ph ph-stack" aria-hidden="true"></i>
+              <div>
+                <b>Entrega em fatias</b>
+                <span>Você testa cedo. Prefiro mostrar funcionando a prometer slide.</span>
+              </div>
+            </li>
+            <li>
+              <i class="ph ph-wrench" aria-hidden="true"></i>
+              <div>
+                <b>Feito para manter</b>
+                <span>Código organizado para você não ficar refém no primeiro ajuste.</span>
+              </div>
+            </li>
+          </ul>
+        </aside>
       </div>
     </section>
 
-    <!-- PROCESSO -->
     <section id="processo" class="section process">
       <div class="section-head">
-        <h2 class="neon">Processo de trabalho</h2>
-        <p>Simples, iterativo e transparente.</p>
+        <h2>Processo</h2>
+        <p>Do primeiro áudio no WhatsApp até o sistema no ar.</p>
       </div>
-      <ol class="steps">
-        <li class="step glow"><span>1</span><b>Briefing</b><i>alinhamento inicial</i></li>
-        <li class="step glow"><span>2</span><b>Proposta</b><i>escopo + prazos</i></li>
-        <li class="step glow"><span>3</span><b>Kickoff</b><i>setup e milestones</i></li>
-        <li class="step glow"><span>4</span><b>Entrega</b><i>builds frequentes</i></li>
-        <li class="step glow"><span>5</span><b>Go-live</b><i>deploy + suporte</i></li>
+      <ol class="timeline">
+        <li class="timeline-step">
+          <span class="timeline-num">1</span>
+          <div>
+            <b>Briefing</b>
+            <i>O que dói hoje e o que precisa existir amanhã</i>
+          </div>
+        </li>
+        <li class="timeline-step">
+          <span class="timeline-num">2</span>
+          <div>
+            <b>Proposta</b>
+            <i>Escopo fechado, prazo e valor sem surpresa</i>
+          </div>
+        </li>
+        <li class="timeline-step">
+          <span class="timeline-num">3</span>
+          <div>
+            <b>Kickoff</b>
+            <i>Ambiente, acesso e primeiras telas</i>
+          </div>
+        </li>
+        <li class="timeline-step">
+          <span class="timeline-num">4</span>
+          <div>
+            <b>Entrega</b>
+            <i>Builds frequentes para você validar</i>
+          </div>
+        </li>
+        <li class="timeline-step">
+          <span class="timeline-num">5</span>
+          <div>
+            <b>Go-live</b>
+            <i>Deploy, ajuste fino e suporte inicial</i>
+          </div>
+        </li>
       </ol>
     </section>
 
-    <!-- PLANOS -->
     <section id="planos" class="section pricing">
       <div class="section-head">
-        <h2 class="neon">Planos & Orçamento</h2>
-        <p>Modelos acessíveis para quem está começando.</p>
+        <h2>Planos e orçamento</h2>
+        <p>Preço de entrada para fechar com clareza. Escopo escrito antes de começar.</p>
       </div>
       <div class="plans">
-        <div class="plan glass tilt">
+        <div class="plan glass">
           <h3>Hora</h3>
-          <p>Ajustes pontuais e pequenas melhorias.</p>
-          <div class="price">R$ 50/h</div><a href="#contato" class="btn small primary magnetic">Reservar</a>
+          <p>Ajuste pontual, bug ou melhoria pequena no que já existe.</p>
+          <div class="price">R$ 50<span>/h</span></div>
+          <ul class="plan-points">
+            <li>Ideal para correção rápida</li>
+            <li>Combinamos teto de horas</li>
+          </ul>
+          <a href="#contato" class="btn small primary magnetic">Reservar</a>
         </div>
-        <div class="plan glass tilt featured">
-          <div class="-badge neon">Mais pedido</div>
+        <div class="plan glass featured">
+          <div class="plan-badge">Mais pedido</div>
           <h3>Diária</h3>
-          <p>Foco total em uma demanda.</p>
-          <div class="price">R$ 320/dia</div><a href="#contato" class="btn small primary magnetic">Fechar</a>
+          <p>Um dia focado numa demanda: painel, script ou módulo.</p>
+          <div class="price">R$ 320<span>/dia</span></div>
+          <ul class="plan-points">
+            <li>Entrega demonstrável no fim do dia</li>
+            <li>Bom para validar ideias</li>
+          </ul>
+          <a href="#contato" class="btn small primary magnetic">Fechar</a>
         </div>
-        <div class="plan glass tilt">
+        <div class="plan glass">
           <h3>Projeto</h3>
-          <p>Escopo fechado para dashboard, automação ou sistema.</p>
-          <div class="price">A partir de R$ 850</div><a href="#contato" class="btn small primary magnetic">Briefing</a>
+          <p>Escopo fechado de dashboard, automação ou sistema.</p>
+          <div class="price">A partir de R$ 850</div>
+          <ul class="plan-points">
+            <li>Proposta com prazo e entregáveis</li>
+            <li>Pagamento por marco</li>
+          </ul>
+          <a href="#contato" class="btn small primary magnetic">Briefing</a>
+        </div>
+      </div>
+
+      <div class="scope-box glass">
+        <div>
+          <h3>Entra no valor</h3>
+          <ul>
+            <li>Desenvolvimento e testes do escopo combinado</li>
+            <li>Deploy inicial e acesso de uso</li>
+            <li>Ajustes de validação dentro do pacote</li>
+            <li>Explicação rápida de uso (WhatsApp ou call curta)</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Não entra (salvo combinado)</h3>
+          <ul>
+            <li>Hospedagem, domínio e mensalidade de servidor</li>
+            <li>Manutenção contínua após a entrega</li>
+            <li>Mudanças grandes fora do escopo</li>
+            <li>Design de marca / identidade visual completa</li>
+          </ul>
         </div>
       </div>
 
       <form id="quoteForm" class="quote glass">
-        <h3>Calcular orçamento</h3>
-        <div class="q-row">
-          <label>Páginas <input type="number" name="pages" min="1" value="3"></label>
-          <label><input type="checkbox" name="cms" checked> Painel administrativo</label>
-          <label><input type="checkbox" name="animations" checked> Interface personalizada</label>
-          <label><input type="checkbox" name="ecommerce"> E-commerce</label>
-          <label><input type="checkbox" name="seo" checked> Otimização técnica</label>
-          <label><input type="checkbox" name="rush"> Urgência</label>
+        <h3>Estimativa rápida</h3>
+        <p class="quote-hint">Escolha o tipo de entrega. O valor é uma faixa inicial; o fechamento vem depois do briefing.</p>
+        <div class="q-row q-row--delivery">
+          <label>Tipo de entrega
+            <select name="type">
+              <option value="dashboard">Dashboard / painel</option>
+              <option value="automacao">Automação Python</option>
+              <option value="sistema">Sistema CRUD</option>
+            </select>
+          </label>
+          <label>Complexidade
+            <select name="size">
+              <option value="simples">Simples</option>
+              <option value="medio" selected>Média</option>
+              <option value="completo">Completa</option>
+            </select>
+          </label>
+          <label><input type="checkbox" name="integracoes"> Integração com planilha/API externa</label>
+          <label><input type="checkbox" name="auth"> Login e permissões</label>
+          <label><input type="checkbox" name="deploy" checked> Deploy incluso</label>
+          <label><input type="checkbox" name="rush"> Urgência (prazo apertado)</label>
         </div>
-        <button class="btn primary magnetic" type="submit">Calcular</button>
-        <output id="quoteOut">—</output>
+        <button class="btn primary magnetic" type="submit">Calcular faixa</button>
+        <output id="quoteOut">Estimativa</output>
       </form>
     </section>
 
-    <!-- CONTATO -->
     <section id="contato" class="section contact">
       <div class="section-head">
-        <h2 class="neon">Contato</h2>
-        <p>Me chame e vamos tirar a ideia do papel. ⚡</p>
+        <h2>Contato</h2>
+        <p>Conta o problema. Eu respondo com caminho e próximo passo.</p>
       </div>
       <form id="contactForm" class="glass form-modern">
         <div class="f-grid">
           <div class="field">
-            <input id="f-name" name="name" required placeholder=" " />
+            <input id="f-name" name="name" required placeholder=" " autocomplete="name" />
             <label for="f-name">Seu nome</label>
-            <span class="icon">👤</span>
+            <i class="ph ph-user field-icon" aria-hidden="true"></i>
           </div>
           <div class="field">
-            <input id="f-email" type="email" name="email" required placeholder=" " />
+            <input id="f-email" type="email" name="email" required placeholder=" " autocomplete="email" />
             <label for="f-email">Seu e-mail</label>
-            <span class="icon">✉️</span>
+            <i class="ph ph-envelope-simple field-icon" aria-hidden="true"></i>
           </div>
           <div class="field">
-            <input id="f-budget" type="number" name="budget" placeholder=" " />
+            <input id="f-budget" type="number" name="budget" placeholder=" " inputmode="numeric" />
             <label for="f-budget">Budget (opcional)</label>
-            <span class="icon">💰</span>
+            <i class="ph ph-currency-dollar field-icon" aria-hidden="true"></i>
           </div>
           <div class="field full">
             <textarea id="f-msg" name="message" rows="5" required placeholder=" "></textarea>
-            <label for="f-msg">Conte sobre o projeto</label>
-            <span class="icon">📝</span>
+            <label for="f-msg">Qual é a dor hoje?</label>
+            <i class="ph ph-note-pencil field-icon" aria-hidden="true"></i>
           </div>
         </div>
         <div class="form-actions">
           <button class="btn primary magnetic" type="submit">Enviar</button>
+          <a class="btn ghost magnetic" href="https://wa.me/5544997135259" target="_blank" rel="noreferrer">WhatsApp</a>
           <p class="form-msg" id="formMsg" role="status"></p>
         </div>
       </form>
     </section>
   </main>
 
-  <!-- Footer centralizado -->
   <footer class="footer glass">
     <div class="footer-inner">
-      <img src="/assets/logo.png" alt="Logo Gabriel França" class="brand-logo"
-        onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%239B5CFF%22/><stop offset=%22100%25%22 stop-color=%22%236D2CFF%22/></linearGradient></defs><circle cx=%2248%22 cy=%2248%22 r=%2246%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2258%22 font-family=%22Outfit%22 font-size=%2238%22 text-anchor=%22middle%22 fill=%22white%22>GF</text></svg>';">
-      <p class="foot-title">Gabriel França — Dashboards, Automações e Sistemas</p>
-      <nav class="foot-nav">
+      <img src="/assets/logo-mark.png" alt="Logo Gabriel França" class="brand-logo"
+        onerror="this.onerror=null;this.src='/assets/favicon-32.png';">
+      <p class="foot-title">Gabriel França - Painéis, rotinas e sistemas que rodam</p>
+      <nav class="foot-nav" aria-label="Rodapé">
         <a href="#servicos">Serviços</a>
-        <a href="#projetos">Projetos</a>
+        <a href="#projetos">Escopos</a>
         <a href="#sobre">Sobre</a>
         <a href="#planos">Planos</a>
         <a href="#contato">Contato</a>
       </nav>
       <div class="foot-social">
-        <a aria-label="GitHub" href="#" class="ico">🐙</a>
-        <a aria-label="LinkedIn" href="#" class="ico">💼</a>
-        <a aria-label="Email" href="#contato" class="ico">✉️</a>
+        <a aria-label="GitHub" href="https://github.com/" class="ico" target="_blank" rel="noreferrer">
+          <i class="ph ph-github-logo" aria-hidden="true"></i>
+        </a>
+        <a aria-label="LinkedIn" href="https://www.linkedin.com/" class="ico" target="_blank" rel="noreferrer">
+          <i class="ph ph-linkedin-logo" aria-hidden="true"></i>
+        </a>
+        <a aria-label="E-mail" href="mailto:gabrielfrancasimoes@gmail.com" class="ico">
+          <i class="ph ph-envelope-simple" aria-hidden="true"></i>
+        </a>
       </div>
       <small>© <span id="year"></span> Gabriel França. Todos os direitos reservados.</small>
     </div>

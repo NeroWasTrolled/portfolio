@@ -1,7 +1,7 @@
 {
-  "name": "futuristic-portfolio",
+  "name": "gabriel-franca-portfolio",
   "version": "1.0.0",
-  "description": "Portfólio futurista com efeitos e backend Express",
+  "description": "Portfolio freelancer: dashboards, automacoes Python e sistemas web",
   "main": "server.js",
   "type": "module",
   "scripts": {
