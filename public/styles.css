@@ -209,8 +209,12 @@ main#main { padding-top: 57px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(28px, 4vw, 42px); }
 
 /* ===== 3-up strip ===== */
+/* Kept as two elements on purpose: the clipped, rounded box must not be the
+   same element that receives the [data-reveal] transform, or Safari/iOS
+   fails to clip its border-radius during the transition and the background
+   bleeds past the rounded corners. */
+.strip-section { max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px) clamp(56px, 8vw, 110px); }
 .strip {
-  max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px) clamp(56px, 8vw, 110px);
   display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px;
   background: rgba(236, 231, 230, 0.1); border: 1px solid rgba(236, 231, 230, 0.1);
   border-radius: 8px; overflow: hidden;
